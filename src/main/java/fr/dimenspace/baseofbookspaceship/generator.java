@@ -18,11 +18,12 @@ class ship {
     private int price;
     private int flightDuration; // in days
     private boolean cryostase;
+    private boolean isFull;
 
 
 
     public ship(int shipId, String shipName, String companyName, int places, int placesBooked,
-                LocalDateTime boardingDate, LocalDateTime departureDate, LocalDateTime arrivalDate, int price, int flightDuration, boolean cryostase) {
+                LocalDateTime boardingDate, LocalDateTime departureDate, LocalDateTime arrivalDate, int price, int flightDuration, boolean cryostase, boolean isFull) {
         this.shipId = shipId;
         this.shipName = shipName;
         this.companyName = companyName;
@@ -34,6 +35,7 @@ class ship {
         this.price = price;
         this.flightDuration = flightDuration;
         this.cryostase = cryostase;
+        this.isFull = isFull;
     }
 }
 public class generator {
@@ -66,10 +68,8 @@ public class generator {
             String shipName = shipNames.get(i); // prends un nom dans la liste
 
             // prend un nom d'entreprise au hasard dans la liste (pareil, c'est relatif à la taille)
-            //Random random = new Random();
             int placeInTheList = rand.nextInt(companyNames.size());
             String companyName = companyNames.get(placeInTheList);
-            System.out.println(companyName);
 
             // le prix va dépendre de `placesBooked`, `cryostase` et de `flightDuration`
             // + de `places` , - chère
@@ -78,27 +78,51 @@ public class generator {
             // + de `flightDuration` , - chère
 
             int places = rand.nextInt(281) + 20; // nombre de places aléatoire entre 20 et 300
-            System.out.println(places + " places");
 
             double doublePrice = (1.0/places) * 1000000; // 300 = 3 333 ; 20 = 50 000
-            //int price = (int) doublePrice * 100; // le prix est + élevé et c'est + réaliste d'avoir au moins 2 zéros
-                                                // à la fin d'un prix aussi grand (le  max est 5 millions d'€)
+
+            // flightDuration est entre 120 et 365 jours et ne dépend pas du prix
+            int flightDuration = rand.nextInt(246) + 120;
+            doublePrice = doublePrice * (1.0/flightDuration * 100); // +27% pour 365 ; +83% pour 120
+
+            // placesBooked est un nombre aléatoire entre 20% des places et +20% des place
+            // si placesBooked >= places, alors le vol sera complet
+            // c'est pour ne pas avoir 1% ou moins de chances pour que le vol soit complet
+
+            double calcul_1 = places - (places * 0.8);
+            int minBooked = (int) calcul_1;
+
+            double calcul_2 = places * 1.2;
+            int maxBooked = (int) calcul_2;
+
+            double placesBooked = rand.nextInt(maxBooked - minBooked + 1) + minBooked;
+            boolean isFull = placesBooked >= places; // bon euh ça se voit je crois
+
             // 1 chance sur 10 qu'il y ait une cryostase
             boolean cryostase = rand.nextInt(10) == 0;
             if (cryostase) {
                 doublePrice = doublePrice - (doublePrice * 0.15); // -15% du prix si il y a cryostase
             }
 
-            // flightDuration est entre 120 et 365 jours et ne dépend pas du prix
-            int flightDuration = rand.nextInt(246) + 120;
-            doublePrice = doublePrice * (1.0/doublePrice * 100); // +27% pour 365 ; +83% pour 120
+            // le prix final sera influencé par le nombre de places restantes, calculé au-dessus
+            // c'est assez simple : 70-79% réservées = +15% ; 80-89% réservées = +25% ; >=90% réservées = +35%
+            float ratio = (float) placesBooked / places;
+            if (ratio <= 0.79 && ratio >= 0.7) {
+                doublePrice = doublePrice * 1.15; // +15%
+            }
+            else if (ratio <= 0.89 && ratio >= 0.8) {
+                doublePrice = doublePrice * 1.25; // +25%
+            }
+            else if (ratio >= 0.9) {
+                doublePrice = doublePrice * 1.35; // +35%
+            }
 
-            // placesBooked est un nombre aléatoire entre 20% des places et +25% des place
-            // si placesBooked >= places, alors le vol sera complet
-            // c'est pour ne pas avoir 1% ou moins de chances pour que le vol soit complet
+            // et pour en finir avec le prix, j'en fais un int et je *100
+            int price = (int) doublePrice * 100; // le prix est + élevé et c'est + réaliste d'avoir au moins 2 zéros
+                                                // à la fin d'un prix aussi grand
 
+            // maintenant je m'occupe des dates
         }
-
 
     }
 }
