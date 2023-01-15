@@ -1,6 +1,7 @@
 package fr.dimenspace.baseofbookspaceship;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -49,13 +50,54 @@ public class generator {
         List<String> companyNames = List.of("SpaceX", "Boeing", "Blue Origin", "Arianespace", "Virgin Galactic",
                                             "Lockheed Martin", "Northrop Grumman", "SNC");
         // merci ChatGPT pour les noms
-        Random rand = new Random();
-        int randomInt = rand.nextInt(1000000);
-
-        // fait en sorte que les Ids fassent 6 chiffres
-        String shipId = String.format("%06d", randomInt);
 
 
+        // je crée une liste de tous mes vaisseaux que je vais générer ..
+        List<ship> shipList = new ArrayList<>();
+
+        // .. juste ici avec cette boucle, je met pas 20 au cas où je veuille ajouter d'autres noms plus tard
+        for (int i = 0; i < shipNames.size(); i++) {
+
+            // trouve un id aléatoire à 6 chiffres allant de 000000 à 999999
+            Random rand = new Random();
+            int randomInt = rand.nextInt(1000000);
+            String shipId = String.format("%06d", randomInt); // fait en sorte que les Ids fassent 6 chiffres
+
+            String shipName = shipNames.get(i); // prends un nom dans la liste
+
+            // prend un nom d'entreprise au hasard dans la liste (pareil, c'est relatif à la taille)
+            //Random random = new Random();
+            int placeInTheList = rand.nextInt(companyNames.size());
+            String companyName = companyNames.get(placeInTheList);
+            System.out.println(companyName);
+
+            // le prix va dépendre de `placesBooked`, `cryostase` et de `flightDuration`
+            // + de `places` , - chère
+            // + de `placesBooked` / rapport à `places` , + chère
+            // `cryostase` = true , plus chère
+            // + de `flightDuration` , - chère
+
+            int places = rand.nextInt(281) + 20; // nombre de places aléatoire entre 20 et 300
+            System.out.println(places + " places");
+
+            double doublePrice = (1.0/places) * 1000000; // 300 = 3 333 ; 20 = 50 000
+            //int price = (int) doublePrice * 100; // le prix est + élevé et c'est + réaliste d'avoir au moins 2 zéros
+                                                // à la fin d'un prix aussi grand (le  max est 5 millions d'€)
+            // 1 chance sur 10 qu'il y ait une cryostase
+            boolean cryostase = rand.nextInt(10) == 0;
+            if (cryostase) {
+                doublePrice = doublePrice - (doublePrice * 0.15); // -15% du prix si il y a cryostase
+            }
+
+            // flightDuration est entre 120 et 365 jours et ne dépend pas du prix
+            int flightDuration = rand.nextInt(246) + 120;
+            doublePrice = doublePrice * (1.0/doublePrice * 100); // +27% pour 365 ; +83% pour 120
+
+            // placesBooked est un nombre aléatoire entre 20% des places et +25% des place
+            // si placesBooked >= places, alors le vol sera complet
+            // c'est pour ne pas avoir 1% ou moins de chances pour que le vol soit complet
+
+        }
 
 
     }
