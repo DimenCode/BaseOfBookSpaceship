@@ -1,13 +1,14 @@
 package fr.dimenspace.baseofbookspaceship;
 
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 class ship {
 
-    private int shipId;
+    private String shipId;
     private String shipName;
     private String companyName;
     private int places;
@@ -18,12 +19,13 @@ class ship {
     private int price;
     private int flightDuration; // in days
     private boolean cryostase;
-    private boolean isFull;
+    private int boardingDuration; // in days
 
 
 
-    public ship(int shipId, String shipName, String companyName, int places, int placesBooked,
-                LocalDateTime boardingDate, LocalDateTime departureDate, LocalDateTime arrivalDate, int price, int flightDuration, boolean cryostase, boolean isFull) {
+    public ship(String shipId, String shipName, String companyName, int places, int placesBooked,
+                LocalDateTime boardingDate, LocalDateTime departureDate, LocalDateTime arrivalDate,
+                int price, int flightDuration, boolean cryostase, int boardingDuration) {
         this.shipId = shipId;
         this.shipName = shipName;
         this.companyName = companyName;
@@ -35,8 +37,21 @@ class ship {
         this.price = price;
         this.flightDuration = flightDuration;
         this.cryostase = cryostase;
-        this.isFull = isFull;
+        this.boardingDuration = boardingDuration;
     }
+    public String getShipId() {return shipId;}
+    public String getShipName() {return shipName;}
+    public String getCompanyName() {return companyName;}
+    public int getPlaces() {return places;}
+    public int getPlacesBooked() {return placesBooked;}
+    public LocalDateTime getBoardingDate() {return boardingDate;}
+    public LocalDateTime getDepartureDate() {return departureDate;}
+    public LocalDateTime getArrivalDate() {return arrivalDate;}
+    public int getPrice() {return  price;}
+    public int getFlightDuration() {return flightDuration;}
+    public boolean isCryostase() {return cryostase;}
+    public int getBoardingDuration() {return boardingDuration;}
+
 }
 public class generator {
 
@@ -121,7 +136,48 @@ public class generator {
             int price = (int) doublePrice * 100; // le prix est + élevé et c'est + réaliste d'avoir au moins 2 zéros
                                                 // à la fin d'un prix aussi grand
 
-            // maintenant je m'occupe des dates
+            // boardingDate (embarcation) sera entre j+1 et j+1000 (j est la date du moment où on refresh)
+            LocalDateTime boardingDate = LocalDateTime.now().plusDays(rand.nextInt(1002) + 1);
+
+            // l'embarcation dure entre 7 et 30 jours, le départ est donc entre 7 et 30 jours après
+            int boardingDuration = rand.nextInt(38) + 7;
+            LocalDateTime departureDate = boardingDate.plusDays(boardingDuration);
+
+            // calcul simple, j'ajoute la durée du voyage à la date de départ pour avoir celle d'arrivée
+            LocalDateTime arrivalDate = departureDate.plusDays(flightDuration);
+
+            // ok, c'est fini, je met tout ça dans une variable ship et j'ajoute à la liste
+            shipList.add(new ship(shipId, shipName, companyName, places, (int) placesBooked, boardingDate, departureDate,
+                                    arrivalDate, price, flightDuration, cryostase, boardingDuration));
+
+        }
+
+        for (int i = 0; i < shipList.size(); i++) {
+            ship theShip = shipList.get(i);
+            System.out.println("----------");
+            System.out.println("Nom : " + theShip.getShipName());
+            System.out.println("Entreprise : " + theShip.getCompanyName());
+            System.out.println("Id : " + theShip.getShipId());
+            System.out.println("Embarcation : " + theShip.getBoardingDate().getDayOfMonth() + "/" +
+                    theShip.getBoardingDate().getMonthValue() + "/" + theShip.getBoardingDate().getYear());
+            System.out.println("Départ : " + theShip.getDepartureDate().getDayOfMonth() + "/" +
+                    theShip.getDepartureDate().getMonthValue() + "/" + theShip.getDepartureDate().getYear() +
+                    " (" + theShip.getBoardingDuration() + " jours pour embarquer)");
+            System.out.println("Prix : " + theShip.getPrice() + " €");
+            System.out.println("Arrivée : " + theShip.getArrivalDate().getDayOfMonth() + "/" +
+                    theShip.getArrivalDate().getMonthValue() + "/" + theShip.getArrivalDate().getYear() +
+                    " ( " + theShip.getFlightDuration() + " jours de voyage)");
+            if (theShip.getPlacesBooked() >= theShip.getPlaces()) {
+                System.out.println("Places : " + theShip.getPlaces() + " places réservées sur " + theShip.getPlaces() +
+                        " (aucune place restantes)");
+            } else {
+                System.out.println("Places : " + theShip.getPlaces() + " réservées sur " + theShip.getPlaces() +
+                        " (" + (theShip.getPlaces() - theShip.getPlacesBooked()) + " places restantes)");
+            }
+            if (theShip.isCryostase()) {
+                System.out.println("Vous serez dans des capsules cryogéniques durant tout le voyage, " +
+                        "l'OMS déconseille les séjours dans ces capsules au-dela de 3 mois");
+            }
         }
 
     }
