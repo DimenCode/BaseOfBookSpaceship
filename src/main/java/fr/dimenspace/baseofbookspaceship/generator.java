@@ -166,7 +166,7 @@ public class generator {
             System.out.println("Prix : " + theShip.getPrice() + " €");
             System.out.println("Arrivée : " + theShip.getArrivalDate().getDayOfMonth() + "/" +
                     theShip.getArrivalDate().getMonthValue() + "/" + theShip.getArrivalDate().getYear() +
-                    " ( " + theShip.getFlightDuration() + " jours de voyage)");
+                    " (" + theShip.getFlightDuration() + " jours de voyage)");
             if (theShip.getPlacesBooked() >= theShip.getPlaces()) {
                 System.out.println("Places : " + theShip.getPlaces() + " places réservées sur " + theShip.getPlaces() +
                         " (aucune place restantes)");
@@ -176,7 +176,7 @@ public class generator {
             }
             if (theShip.isCryostase()) {
                 System.out.println("Vous serez dans des capsules cryogéniques durant tout le voyage, " +
-                        "l'OMS déconseille les séjours dans ces capsules au-dela de 3 mois");
+                        "\nl'OMS déconseille les séjours dans ces capsules au-dela de 3 mois");
             }
         }
 
