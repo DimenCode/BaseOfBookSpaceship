@@ -171,7 +171,7 @@ public class generator {
                 System.out.println("Places : " + theShip.getPlaces() + " places réservées sur " + theShip.getPlaces() +
                         " (aucune place restantes)");
             } else {
-                System.out.println("Places : " + theShip.getPlaces() + " réservées sur " + theShip.getPlaces() +
+                System.out.println("Places : " + theShip.getPlacesBooked() + " réservées sur " + theShip.getPlaces() +
                         " (" + (theShip.getPlaces() - theShip.getPlacesBooked()) + " places restantes)");
             }
             if (theShip.isCryostase()) {
